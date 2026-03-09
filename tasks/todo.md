@@ -52,18 +52,18 @@
 - [x] Run `flutter analyze` — fix any issues
 
 ### 1.7 Edge Function — `extract`
-- [ ] Create `supabase/functions/extract/index.ts`
-- [ ] Auth is optional — attempt JWT verification but do not return 401 if missing
-- [ ] Cache check first — return `{ ...cached, cached: true }` if video URL already in DB
-- [ ] Get captions via `npm:youtube-caption-extractor`
-- [ ] AssemblyAI fallback if captions unavailable (see spec Section 9.1 for pipeline)
-- [ ] Groq/Llama 3.1 extraction — reuse prompt logic from existing `groq_client.dart` (translated to TypeScript)
-- [ ] Enrich exercises: set `image_url = https://i.ytimg.com/vi/{videoId}/hqdefault.jpg`
-- [ ] Save to `videos` table always
-- [ ] Save to `user_videos` table only if user JWT was valid
-- [ ] Test locally: `supabase functions serve extract --env-file .env.local`
-- [ ] Test with curl: `curl -X POST http://localhost:54321/functions/v1/extract -d '{"url":"..."}'`
-- [ ] Deploy: `supabase functions deploy extract`
+- [x] Create `supabase/functions/extract/index.ts`
+- [x] Auth is optional — attempt JWT verification but do not return 401 if missing
+- [x] Cache check first — return `{ ...cached, cached: true }` if video URL already in DB
+- [x] Transcript via Supadata API (replaced youtube-caption-extractor + AssemblyAI — both blocked by YouTube on server IPs)
+- [x] Groq/Llama 3.1 extraction — structured JSON prompt for workout and diet types
+- [x] Enrich exercises: set `image_url = https://i.ytimg.com/vi/{videoId}/hqdefault.jpg`
+- [x] Save to `videos` table always — upsert with onConflict: 'url' to handle race conditions
+- [x] Save to `user_videos` table only if user JWT was valid
+- [x] Add `SUPADATA_API_KEY` secret: `supabase secrets set SUPADATA_API_KEY=...`
+- [x] Test locally: `supabase functions serve extract --env-file .env.local`
+- [x] Test with curl: `curl -X POST http://localhost:54321/functions/v1/extract -d '{"url":"..."}'`
+- [x] Deploy: `supabase functions deploy extract`
 
 ### 1.8 Edge Function — `history`
 - [ ] Create `supabase/functions/history/index.ts`
