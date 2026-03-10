@@ -79,7 +79,6 @@ abstract class APIRequest {
 
   // ─── Raw HTTP methods ────────────────────────────────────────────────────────
 
-  @protected
   Future<http.Response> post(
     String endpoint, {
     Map? body,
@@ -89,52 +88,79 @@ abstract class APIRequest {
     return _call('POST', endpoint, body: body, headers: headers, url: url);
   }
 
-  @protected
-  Future<http.Response?> postUrl(String url, {Map? body, Map<String, String>? headers}) {
+  Future<http.Response?> postUrl(
+    String url, {
+    Map? body,
+    Map<String, String>? headers,
+  }) {
     return _call('POST', '', body: body, headers: headers, url: url);
   }
 
-  @protected
-  Future<http.Response?> patch(String endpoint, {Map? body, Map<String, String>? headers, String? url}) {
+  Future<http.Response?> patch(
+    String endpoint, {
+    Map? body,
+    Map<String, String>? headers,
+    String? url,
+  }) {
     return _call('PATCH', endpoint, body: body, headers: headers, url: url);
   }
 
-  @protected
-  Future<http.Response?> patchUrl(String url, {Map? body, Map<String, String>? headers}) {
+  Future<http.Response?> patchUrl(
+    String url, {
+    Map? body,
+    Map<String, String>? headers,
+  }) {
     return _call('PATCH', '', body: body, headers: headers, url: url);
   }
 
-  @protected
-  Future<http.Response?> put(String endpoint, {Map? body, Map<String, String>? headers, String? url}) {
+  Future<http.Response?> put(
+    String endpoint, {
+    Map? body,
+    Map<String, String>? headers,
+    String? url,
+  }) {
     return _call('PUT', endpoint, body: body, headers: headers, url: url);
   }
 
-  @protected
-  Future<http.Response?> putUrl(String url, {Map? body, Map<String, String>? headers}) {
+  Future<http.Response?> putUrl(
+    String url, {
+    Map? body,
+    Map<String, String>? headers,
+  }) {
     return _call('PUT', '', body: body, headers: headers, url: url);
   }
 
-  @protected
-  Future<http.Response> get(String endpoint, {Map<String, String>? headers, String? url}) {
+  Future<http.Response> get(
+    String endpoint, {
+    Map<String, String>? headers,
+    String? url,
+  }) {
     return _call('GET', endpoint, headers: headers, url: url);
   }
 
-  @protected
-  Future<http.Response?> getUrl(String url, {Map<String, String>? headers}) {
+  Future<http.Response?> getUrl(
+    String url, {
+    Map<String, String>? headers,
+  }) {
     return _call('GET', '', headers: headers, url: url);
   }
 
-  @protected
-  Future<http.Response?> delete(String endpoint, {Map<String, String>? headers, String? url, Map? body}) {
+  Future<http.Response?> delete(
+    String endpoint, {
+    Map<String, String>? headers,
+    String? url,
+    Map? body,
+  }) {
     return _call('DELETE', endpoint, headers: headers, url: url, body: body);
   }
 
-  @protected
-  Future<http.Response?> deleteUrl(String url, {Map<String, String>? headers}) {
+  Future<http.Response?> deleteUrl(
+    String url, {
+    Map<String, String>? headers,
+  }) {
     return _call('DELETE', '', headers: headers, url: url);
   }
 
-  @protected
   Future<http.Response?> multipart(
     String endpoint, {
     Map? body,
@@ -145,8 +171,12 @@ abstract class APIRequest {
     return _call('multipart', endpoint, headers: headers, url: url, body: body, files: files);
   }
 
-  @protected
-  Future<http.Response?> multipartUrl(String url, {Map? body, Map<String, File>? files, Map<String, String>? headers}) {
+  Future<http.Response?> multipartUrl(
+    String url, {
+    Map? body,
+    Map<String, File>? files,
+    Map<String, String>? headers,
+  }) {
     return _call('multipart', '', headers: headers, url: url, body: body, files: files);
   }
 

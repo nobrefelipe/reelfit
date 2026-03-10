@@ -48,8 +48,7 @@ class HistoryController {
 
     await AppCache().clearGuestVideos();
     await AppCache().setGuestVideoCount(0);
-    // ignore: unawaited_futures
-    refresh(showLoading: false);
+    await refresh(showLoading: false);
   }
 }
 

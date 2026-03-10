@@ -37,8 +37,9 @@ class ExtractController {
     if (result is Success<VideoModel>) {
       if (isGuest) {
         await AppCache().saveGuestVideo(result.value.toJson());
-        await AppCache().setGuestVideoCount(guestCount.value + 1);
-        guestCount.emit(guestCount.value + 1);
+        final newCount = guestCount.value + 1;
+        await AppCache().setGuestVideoCount(newCount);
+        guestCount.emit(newCount);
       } else {
         historyController.refresh(showLoading: false);
       }
