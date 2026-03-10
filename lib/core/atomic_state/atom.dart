@@ -33,8 +33,8 @@ class Atom<T> extends ValueNotifier<T> {
     Widget fallback = const SizedBox(),
   }) {
     assert(
-      T == bool || T == String || _isList<T>(),
-      'Atom.call() should only be used with Atom<bool>, Atom<String>, or Atom<List>. '
+      T == bool || T == String || _isList<T>() || T == int,
+      'Atom.call() should only be used with Atom<bool>, Atom<String>, Atom<List> or Atom<int>. '
       'For async data use AsyncAtom instead.',
     );
 
@@ -44,6 +44,7 @@ class Atom<T> extends ValueNotifier<T> {
         if (value is bool) return value ? builder(value) : fallback;
         if (value is String) return value.isNotEmpty ? builder(value) : fallback;
         if (value is List) return value.isNotEmpty ? builder(value) : fallback;
+        if (value is int) return builder(value);
         return fallback;
       },
     );

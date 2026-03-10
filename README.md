@@ -85,6 +85,24 @@ See `CLAUDE.md` for the full architecture rules.
 
 ---
 
+## core/ — custom state management
+
+The state management in this project is not a third-party package. `core/` is a custom infrastructure layer built from scratch after years of working with Provider, Riverpod, Bloc, and GetX — and finding that each one solved the demo case well and created friction at scale.
+
+The result is three small primitives that cover everything:
+
+**`Atom<T>`** — a reactive value that calls `emit()` to update and is itself a valid widget builder. No `ValueListenableBuilder` boilerplate, no `Consumer`, no `context.watch()`.
+
+**`AsyncAtom<T>`** — wraps `Result<T>` for async data. Self-registers in a global registry on creation and resets automatically on logout. Callable as a widget with named parameters for each state — `success`, `loading`, `failure`, `empty`.
+
+**`Result<T>`** — a sealed class with five states: `Idle`, `Loading`, `Success`, `Failure`, `Empty`. Every async operation in the app returns one of these. The compiler enforces exhaustive handling — you cannot forget the error case.
+
+Together they make the right pattern the path of least resistance. Following the architecture takes less code than fighting it.
+
+→ See [`core/README.md`](./lib/core/README.md) for the full writeup.
+
+---
+
 ## Extraction pipeline
 
 ```
@@ -176,7 +194,7 @@ supabase functions deploy progress
 
 - [x] POC — Dart Frog backend + Flutter UI
 - [x] Serverless architecture design
-- [ ] Supabase Edge Functions pipeline
+- [x] Supabase Edge Functions pipeline
 - [ ] Flutter auth + guest mode
 - [ ] Full UI wiring
 - [ ] Progress tracking

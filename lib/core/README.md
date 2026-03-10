@@ -2,6 +2,21 @@
 
 > Zero app-specific knowledge. Pure infrastructure. Copy it unchanged to any Flutter project and it works.
 
+
+
+## About this architecture
+
+This is not a framework. It's not a package. It's not an opinionated wrapper around someone else's solution.
+
+`core/` is something I built myself — gradually, over several years of shipping Flutter apps and living with the consequences of the decisions I made in them. It grew out of frustration with the state management ecosystem: the churn, the boilerplate, the way third-party solutions solve the demo case perfectly and fall apart at scale. I tried Provider, Riverpod, Bloc, GetX, and combinations of all of them. Each time I found myself fighting the library as much as I was fighting the problem.
+
+So I stopped reaching for packages and started thinking about what I actually needed. The answer was simpler than any of them: a reactive value that rebuilds widgets, a typed result that covers every async state, and a strict separation between data and UI. Everything in `core/` is an expression of those three ideas.
+
+The primitives are small enough to read in an afternoon and opinionated enough to keep a codebase consistent across a team and across years. They have no dependencies outside of Flutter itself. If something doesn't work the way you expect, you can read the source and fix it — there's no black box.
+
+
+---
+
 This is the single rule that governs everything in this folder. If a file needs to import a feature route, a business model, or any screen — it doesn't belong here. `core/` is the foundation the app is built on, not a part of the app itself.
 
 ---
