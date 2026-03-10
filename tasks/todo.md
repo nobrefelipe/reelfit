@@ -120,8 +120,8 @@
 
 ### 3.4 WorkoutDetailScreen
 - [x] Wired to extractResult atom
-- [ ] Fix: use atom as widget — never read .value directly in build() (see lessons.md)
-- [ ] Run flutter analyze after
+- [x] Fix: use atom as widget — never read .value directly in build() (see lessons.md)
+- [x] Run flutter analyze after
 
 ### 3.5 ExerciseDetailScreen
 - [ ] Read existing file before editing

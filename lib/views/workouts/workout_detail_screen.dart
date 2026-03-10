@@ -13,9 +13,9 @@ class WorkoutDetailScreen extends StatelessWidget {
   final String videoId;
 
   Widget _noData(BuildContext context) => Scaffold(
-        appBar: AppBar(title: UIKText.h4('Workout')),
-        body: Center(child: UIKText.body('No workout data available.')),
-      );
+    appBar: AppBar(title: UIKText.h4('Workout')),
+    body: Center(child: UIKText.body('No workout data available.')),
+  );
 
   @override
   Widget build(BuildContext context) {
