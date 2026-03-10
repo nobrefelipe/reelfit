@@ -5,13 +5,14 @@ import '../../controllers/extract_controller.dart';
 import '../../controllers/history_controller.dart';
 import '../../core/atomic_state/result.dart';
 import '../../core/global_atoms.dart';
+import '../../core/ui/notifications/snackbar/snackbar.dart';
 import '../../core/ui/text.dart';
 import '../../models/video_model.dart';
 import '../auth/sign_in_sheet.dart';
 import '../auth/widgets/profile_button.dart';
 import '../auth/widgets/sign_in_button.dart';
-import 'extract_sheet.dart';
 import 'widgets/empty_state.dart';
+import 'widgets/extract_input.dart';
 import 'widgets/guest_counter_banner.dart';
 import 'widgets/sign_in_banner.dart';
 import 'widgets/skeleton_list.dart';
@@ -25,6 +26,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final _urlController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -36,6 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
+    _urlController.dispose();
     authState.removeListener(_onAuthChanged);
     extractResult.removeListener(_onExtractResult);
     super.dispose();
@@ -47,6 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (!mounted) return;
     final result = extractResult.value;
     if (result is Success<VideoModel>) {
+      _urlController.clear();
       final video = result.value;
       if (video.type == 'workout') {
         context.go('/workout/${video.videoId}');
@@ -55,13 +60,18 @@ class _HomeScreenState extends State<HomeScreen> {
         context.go('/diet/${video.videoId}');
         extractController.reset();
       }
-    } else if (result is Failure<VideoModel> && result.message == 'guest_limit') {
-      extractController.reset();
-      SignInSheet.show(
-        context,
-        title: "You've used your 3 free extracts",
-        subtitle: 'Sign in with Google to save unlimited workouts and track your progress.',
-      );
+    } else if (result is Failure<VideoModel>) {
+      final msg = result.message;
+      if (msg == 'guest_limit') {
+        extractController.reset();
+        SignInSheet.show(
+          context,
+          title: "You've used your 3 free extracts",
+          subtitle: 'Sign in with Google to save unlimited workouts and track your progress.',
+        );
+      } else {
+        UIKShowSnackBar(context, message: msg, type: UIKSnackBarType.error);
+      }
     }
   }
 
@@ -79,21 +89,11 @@ class _HomeScreenState extends State<HomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           if (extractController.isGuest)
-            guestBannerDismissed(
-              (dismissed) => dismissed
-                  ? const SizedBox.shrink()
-                  : guestCount(
-                      (count) => count > 0
-                          ? GuestCounterBanner(
-                              used: count,
-                              onDismiss: () => guestBannerDismissed.emit(true),
-                            )
-                          : const SizedBox.shrink(),
-                    ),
-            )
-          else
-            const SizedBox.shrink(),
-          if (extractController.isGuest) const SignInBanner(),
+            guestCount(
+              (count) => count > 0
+                  ? GuestCounterBanner(used: count)
+                  : const SizedBox.shrink(),
+            ),
           Expanded(
             child: history(
               loading: () => const SkeletonList(),
@@ -102,11 +102,10 @@ class _HomeScreenState extends State<HomeScreen> {
               success: VideoList.new,
             ),
           ),
+          ExtractInput(urlController: _urlController),
+          if (extractController.isGuest) const SignInBanner(),
+          const SizedBox(height: 20),
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => ExtractSheet.show(context),
-        child: const Icon(Icons.add),
       ),
     );
   }

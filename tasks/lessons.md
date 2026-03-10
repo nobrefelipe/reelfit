@@ -234,6 +234,21 @@ Future<void> findByVideoId(String videoId) async {
 
 ---
 
+**Never use Spacer() inside a Column without an Expanded parent**
+`Spacer()` requires an unbounded axis to be bounded — inside a plain `Column` with no `Expanded` ancestor it causes a `RenderFlex` unbounded height error at runtime. Use `Expanded` to fill remaining space, or `SizedBox` with a fixed height for gaps:
+```dart
+// wrong — RenderFlex unbounded height error
+Column(children: [const Spacer(), SomeWidget()])
+
+// correct — Expanded fills remaining space
+Column(children: [Expanded(child: SomeWidget())])
+
+// correct — fixed gap
+Column(children: [SomeWidget(), const SizedBox(height: 16), AnotherWidget()])
+```
+
+---
+
 **Never suppress warnings with // ignore: unawaited_futures**
 Fix the underlying issue by adding `await`:
 ```dart

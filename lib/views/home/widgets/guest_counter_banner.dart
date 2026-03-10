@@ -3,10 +3,9 @@ import 'package:flutter/material.dart';
 import '../../../core/ui/text.dart';
 
 class GuestCounterBanner extends StatelessWidget {
-  const GuestCounterBanner({super.key, required this.used, required this.onDismiss});
+  const GuestCounterBanner({super.key, required this.used});
 
   final int used;
-  final VoidCallback onDismiss;
 
   @override
   Widget build(BuildContext context) {
@@ -23,13 +22,6 @@ class GuestCounterBanner extends StatelessWidget {
           Icon(Icons.info_outline, size: 16, color: color),
           const SizedBox(width: 8),
           Expanded(child: UIKText.small('$used/3 free extracts used', color: color)),
-          IconButton(
-            icon: Icon(Icons.close, size: 16, color: color),
-            onPressed: onDismiss,
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
-            visualDensity: VisualDensity.compact,
-          ),
         ],
       ),
     );

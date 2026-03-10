@@ -18,7 +18,7 @@ class EmptyState extends StatelessWidget {
             UIKText.h5('Nothing here yet'),
             const SizedBox(height: 8),
             UIKText.body(
-              'Tap the + button and paste a YouTube Shorts URL to get started.',
+              'Paste a YouTube Shorts URL to get started.',
               textAlign: TextAlign.center,
             ),
           ],
