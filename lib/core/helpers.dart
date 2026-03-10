@@ -162,7 +162,7 @@ class Helper {
     if (value is String) {
       if (value.isNotEmpty) {
         try {
-          return int.parse(value);
+          return int.tryParse(value);
         } catch (error) {
           // re assume this means the value is actually a double, as a string.
           return getIntOrNull(double.parse(value));

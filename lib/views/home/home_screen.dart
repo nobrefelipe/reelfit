@@ -4,11 +4,14 @@ import 'package:go_router/go_router.dart';
 import '../../controllers/extract_controller.dart';
 import '../../controllers/history_controller.dart';
 import '../../core/atomic_state/result.dart';
+import '../../core/global_atoms.dart';
 import '../../core/ui/buttons/ui_kit_button.dart';
-import '../../core/ui/notifications/snackbar/snackbar.dart';
+import '../../core/ui/notifications/dialog/dialog.dart';
 import '../../core/ui/text.dart';
+import '../../data/auth_repository.dart';
 import '../../models/video_model.dart';
 import '../auth/sign_in_sheet.dart';
+import 'extract_sheet.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,61 +20,45 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
-  late final TabController _tabs;
-  final _urlController = TextEditingController();
-
+class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _tabs = TabController(length: 2, vsync: this);
     extractController.init();
-    historyController.load();
+    authState.addListener(_onAuthChanged);
     extractResult.addListener(_onExtractResult);
+    historyController.load();
   }
 
   @override
   void dispose() {
+    authState.removeListener(_onAuthChanged);
     extractResult.removeListener(_onExtractResult);
-    _tabs.dispose();
-    _urlController.dispose();
     super.dispose();
   }
+
+  void _onAuthChanged() => setState(() {});
 
   void _onExtractResult() {
     if (!mounted) return;
     final result = extractResult.value;
-
     if (result is Success<VideoModel>) {
       final video = result.value;
-      extractController.reset();
       if (video.type == 'workout') {
-        context.push('/workout/${video.videoId}');
+        context.push('/workout/${video.videoId}', extra: video);
+        extractController.reset();
       } else if (video.type == 'diet') {
-        context.push('/diet/${video.videoId}');
-      } else {
-        UIKShowSnackBar(context, message: 'Unsupported video type.', type: UIKSnackBarType.error);
-      }
-    } else if (result is Failure<VideoModel>) {
-      final msg = result.message;
-      if (msg == 'guest_limit') {
+        context.push('/diet/${video.videoId}', extra: video);
         extractController.reset();
-        SignInSheet.show(
-          context,
-          title: "You've used your 3 free extracts",
-          subtitle: 'Sign in with Google to save unlimited workouts and track your progress.',
-        );
-      } else {
-        extractController.reset();
-        UIKShowSnackBar(context, message: msg, type: UIKSnackBarType.error);
       }
+    } else if (result is Failure<VideoModel> && result.message == 'guest_limit') {
+      extractController.reset();
+      SignInSheet.show(
+        context,
+        title: "You've used your 3 free extracts",
+        subtitle: 'Sign in with Google to save unlimited workouts and track your progress.',
+      );
     }
-  }
-
-  void _onExtract() {
-    final url = _urlController.text.trim();
-    if (url.isEmpty) return;
-    extractController.extract(url);
   }
 
   @override
@@ -79,74 +66,85 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     return Scaffold(
       appBar: AppBar(
         title: UIKText.h4('ReelFit'),
-        bottom: TabBar(
-          controller: _tabs,
-          tabs: const [Tab(text: 'Extract'), Tab(text: 'History')],
-        ),
-      ),
-      body: TabBarView(
-        controller: _tabs,
-        children: [
-          _ExtractTab(urlController: _urlController, onExtract: _onExtract),
-          const _HistoryTab(),
+        actions: [
+          extractController.isGuest ? const _SignInButton() : const _ProfileButton(),
+          const SizedBox(width: 4),
         ],
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (extractController.isGuest)
+            guestCount(
+              (count) => count > 0 ? _GuestCounterBanner(used: count) : const SizedBox.shrink(),
+            )
+          else
+            const SizedBox.shrink(),
+          Expanded(
+            child: history(
+              loading: () => const _SkeletonList(),
+              empty: () => const _EmptyState(),
+              failure: (msg) => Center(child: UIKText.body(msg)),
+              success: _VideoList.new,
+            ),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => ExtractSheet.show(context),
+        child: const Icon(Icons.add),
       ),
     );
   }
 }
 
 // ---------------------------------------------------------------------------
-// Extract tab
+// AppBar buttons
 // ---------------------------------------------------------------------------
 
-class _ExtractTab extends StatelessWidget {
-  const _ExtractTab({required this.urlController, required this.onExtract});
-
-  final TextEditingController urlController;
-  final VoidCallback onExtract;
+class _SignInButton extends StatelessWidget {
+  const _SignInButton();
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Guest counter — visible only when guest
-          guestCount((count) {
-            if (!extractController.isGuest) return const SizedBox.shrink();
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: _GuestCounterChip(used: count),
-            );
-          }),
-          TextField(
-            controller: urlController,
-            decoration: const InputDecoration(
-              hintText: 'Paste YouTube Shorts URL',
-              border: OutlineInputBorder(),
-            ),
-            keyboardType: TextInputType.url,
-            textInputAction: TextInputAction.go,
-            onSubmitted: (_) => onExtract(),
-          ),
-          const SizedBox(height: 12),
-          // Extract button — loading state mirrors atom
-          extractResult(
-            success: (_) => UIKButton.primary(label: 'Extract', onTap: () async => onExtract()),
-            loading: () => UIKButton.primary(label: 'Extracting…', onTap: null, isLoading: true),
-            failure: (_) => UIKButton.primary(label: 'Extract', onTap: () async => onExtract()),
-            idle: () => UIKButton.primary(label: 'Extract', onTap: () async => onExtract()),
-            empty: () => UIKButton.primary(label: 'Extract', onTap: () async => onExtract()),
-          ),
-        ],
+    return SizedBox(
+      width: 100,
+      child: UIKButton.ghost.small(
+        label: 'Sign in',
+        fullWidth: false,
+        onTap: () async => SignInSheet.show(
+          context,
+          title: 'Sign in to ReelFit',
+          subtitle: 'Sync your history and unlock unlimited extracts.',
+        ),
       ),
     );
   }
 }
 
-class _GuestCounterChip extends StatelessWidget {
-  const _GuestCounterChip({required this.used});
+class _ProfileButton extends StatelessWidget {
+  const _ProfileButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.account_circle_outlined),
+      onPressed: () => ShowDialog(
+        context,
+        title: 'Sign out',
+        content: 'Are you sure you want to sign out?',
+        onConfirm: () => AuthRepository().signOut(),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Guest counter banner
+// ---------------------------------------------------------------------------
+
+class _GuestCounterBanner extends StatelessWidget {
+  const _GuestCounterBanner({required this.used});
 
   final int used;
 
@@ -154,36 +152,96 @@ class _GuestCounterChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = used >= 3
         ? Colors.red
-        : used == 2
-            ? Colors.amber
-            : Theme.of(context).colorScheme.primary;
-    return Chip(
-      label: UIKText.small('$used/3 free extracts used', color: color),
-      backgroundColor: color.withValues(alpha: 0.1),
+        : used >= 2
+        ? Colors.amber.shade700
+        : Theme.of(context).colorScheme.primary;
+    return Container(
+      color: color.withValues(alpha: 0.1),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: Row(
+        children: [
+          Icon(Icons.info_outline, size: 16, color: color),
+          const SizedBox(width: 8),
+          UIKText.small('$used/3 free extracts used', color: color),
+        ],
+      ),
     );
   }
 }
 
 // ---------------------------------------------------------------------------
-// History tab
+// Loading skeleton
 // ---------------------------------------------------------------------------
 
-class _HistoryTab extends StatelessWidget {
-  const _HistoryTab();
+class _SkeletonList extends StatelessWidget {
+  const _SkeletonList();
 
   @override
   Widget build(BuildContext context) {
-    return history(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      empty: () => const _EmptyHistory(),
-      failure: (msg) => Center(child: UIKText.body(msg)),
-      success: (videos) => _HistoryList(videos: videos),
+    return ListView.separated(
+      padding: const EdgeInsets.all(16),
+      itemCount: 3,
+      separatorBuilder: (_, __) => const SizedBox(height: 8),
+      itemBuilder: (_, __) => const _SkeletonCard(),
     );
   }
 }
 
-class _EmptyHistory extends StatelessWidget {
-  const _EmptyHistory();
+class _SkeletonCard extends StatelessWidget {
+  const _SkeletonCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: [
+            Container(
+              width: 72,
+              height: 54,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(6),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    height: 14,
+                    width: 64,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade200,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Empty state
+// ---------------------------------------------------------------------------
+
+class _EmptyState extends StatelessWidget {
+  const _EmptyState();
 
   @override
   Widget build(BuildContext context) {
@@ -193,12 +251,12 @@ class _EmptyHistory extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.video_library_outlined, size: 64, color: Colors.grey),
+            const Icon(Icons.video_library_outlined, size: 72, color: Colors.grey),
             const SizedBox(height: 16),
-            UIKText.h5('No history yet'),
+            UIKText.h5('Nothing here yet'),
             const SizedBox(height: 8),
             UIKText.body(
-              'Paste a YouTube Shorts URL in the Extract tab to get started.',
+              'Tap the + button and paste a YouTube Shorts URL to get started.',
               textAlign: TextAlign.center,
             ),
           ],
@@ -208,64 +266,28 @@ class _EmptyHistory extends StatelessWidget {
   }
 }
 
-class _HistoryList extends StatelessWidget {
-  const _HistoryList({required this.videos});
+// ---------------------------------------------------------------------------
+// Video list
+// ---------------------------------------------------------------------------
+
+class _VideoList extends StatelessWidget {
+  const _VideoList(this.videos);
 
   final List<VideoModel> videos;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        if (historyController.isGuest) const _GuestBanner(),
-        Expanded(
-          child: ListView.separated(
-            padding: const EdgeInsets.all(16),
-            itemCount: videos.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 8),
-            itemBuilder: (_, i) => _HistoryCard(video: videos[i]),
-          ),
-        ),
-      ],
+    return ListView.separated(
+      padding: const EdgeInsets.all(16),
+      itemCount: videos.length,
+      separatorBuilder: (_, __) => const SizedBox(height: 8),
+      itemBuilder: (_, i) => _VideoCard(video: videos[i]),
     );
   }
 }
 
-class _GuestBanner extends StatelessWidget {
-  const _GuestBanner();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      color: Theme.of(context).colorScheme.primaryContainer,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        children: [
-          Expanded(
-            child: UIKText.small(
-              'Sign in to sync your history across devices and unlock unlimited extracts.',
-            ),
-          ),
-          const SizedBox(width: 8),
-          UIKButton.ghost.small(
-            label: 'Sign in',
-            fullWidth: false,
-            onTap: () async => SignInSheet.show(
-              context,
-              title: 'Sync your history',
-              subtitle:
-                  'Sign in with Google to unlock unlimited extracts and sync your history across devices.',
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _HistoryCard extends StatelessWidget {
-  const _HistoryCard({required this.video});
+class _VideoCard extends StatelessWidget {
+  const _VideoCard({required this.video});
 
   final VideoModel video;
 
@@ -279,28 +301,77 @@ class _HistoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final label = video.type == 'workout'
+    final typeLabel = video.type == 'workout'
         ? 'Workout'
         : video.type == 'diet'
-            ? 'Recipe'
-            : 'Video';
+        ? 'Recipe'
+        : 'Video';
+    final d = video.createdAt.toLocal();
+    final dateStr = '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
     return Card(
-      child: ListTile(
-        leading: ClipRRect(
-          borderRadius: BorderRadius.circular(4),
-          child: Image.network(
-            video.thumbnailUrl,
-            width: 64,
-            height: 48,
-            fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => const Icon(Icons.play_circle_outline, size: 48),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () => _navigate(context),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(6),
+                child: Image.network(
+                  video.thumbnailUrl,
+                  width: 72,
+                  height: 54,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => Container(
+                    width: 72,
+                    height: 54,
+                    color: Colors.grey.shade200,
+                    child: const Icon(Icons.play_circle_outline, size: 32, color: Colors.grey),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _TypeBadge(label: typeLabel, type: video.type),
+                    const SizedBox(height: 4),
+                    UIKText.small(dateStr, color: Colors.grey),
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_right, color: Colors.grey),
+            ],
           ),
         ),
-        title: UIKText.body(label),
-        subtitle: UIKText.small(video.url, maxLines: 1, overflow: TextOverflow.ellipsis),
-        trailing: const Icon(Icons.chevron_right),
-        onTap: () => _navigate(context),
       ),
+    );
+  }
+}
+
+class _TypeBadge extends StatelessWidget {
+  const _TypeBadge({required this.label, required this.type});
+
+  final String label;
+  final String type;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = type == 'workout'
+        ? Colors.blue
+        : type == 'diet'
+        ? Colors.green
+        : Colors.grey;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: UIKText.small(label, color: color),
     );
   }
 }

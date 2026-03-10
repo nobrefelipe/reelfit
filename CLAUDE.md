@@ -720,6 +720,8 @@ Access theme-aware colours via the `ThemeData` extension: `Theme.of(context).pri
 - Always read existing files before editing — never assume file contents
 
 ## Workflow
+- Read tasks/lessons.md at the start of every session before writing 
+  any code — it contains corrections from previous sessions
 - For tasks with 3+ steps, write a plan first in `tasks/todo.md`
 - After any correction, log the pattern in `tasks/lessons.md`
 - Review `tasks/lessons.md` at the start of each session

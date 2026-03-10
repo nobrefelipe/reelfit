@@ -36,10 +36,17 @@ class ExtractController {
 
     if (result is Success<VideoModel>) {
       if (isGuest) {
+        final existing = AppCache().getGuestVideos();
+        final alreadySaved = existing.any((v) => v['url'] == result.value.url);
+
+        if (!alreadySaved) {
+          final newCount = guestCount.value + 1;
+          await AppCache().setGuestVideoCount(newCount);
+          guestCount.emit(newCount);
+        }
+
         await AppCache().saveGuestVideo(result.value.toJson());
-        final newCount = guestCount.value + 1;
-        await AppCache().setGuestVideoCount(newCount);
-        guestCount.emit(newCount);
+        historyController.load();
       } else {
         historyController.refresh(showLoading: false);
       }

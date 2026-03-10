@@ -185,8 +185,12 @@ class AppCache extends ICache {
 
   Future<void> saveGuestVideo(Map<String, dynamic> videoJson) async {
     final existing = SharedPreferencesSingleton().getStringList('guest_videos');
-    existing.add(json.encode(videoJson));
-    await SharedPreferencesSingleton().set('guest_videos', existing);
+    final decoded = existing.map((s) => json.decode(s) as Map<String, dynamic>).toList();
+    final updated = [
+      ...decoded.where((v) => v['url'] != videoJson['url']),
+      videoJson,
+    ];
+    await SharedPreferencesSingleton().set('guest_videos', updated.map(json.encode).toList());
   }
 
   List<Map<String, dynamic>> getGuestVideos() {

@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' hide AuthState;
 
 import '../data/auth_repository.dart';
 import 'atomic_state/async_atom.dart';
@@ -29,6 +29,7 @@ class AuthBuilder extends StatefulWidget {
 class _AuthBuilderState extends State<AuthBuilder> {
   late final AppLifecycleListener _lifecycleListener;
   StreamSubscription? _supabaseAuthSubscription;
+  AuthState? _previousAuthState;
 
   @override
   void initState() {
@@ -67,6 +68,7 @@ class _AuthBuilderState extends State<AuthBuilder> {
 
     if (current is Initial) {
       final result = await AuthRepository().checkAuth();
+      _previousAuthState = current;
       authState.emit(result is Success ? Authenticated() : Unauthenticated());
       return;
     }
@@ -74,9 +76,14 @@ class _AuthBuilderState extends State<AuthBuilder> {
     if (current is Authenticated) {
       // historyController.migrateLocalVideos() — wired in Phase 2
     } else if (current is Unauthenticated) {
-      resetAllAtoms();
-      await AppCache().setGuestVideoCount(0);
+      // only reset if user was previously authenticated (real sign-out)
+      if (_previousAuthState is Authenticated) {
+        resetAllAtoms();
+        await AppCache().setGuestVideoCount(0);
+      }
     }
+
+    _previousAuthState = current;
   }
 
   @override
