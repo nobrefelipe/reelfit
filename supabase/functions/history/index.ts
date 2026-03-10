@@ -7,7 +7,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, timezone_name, timezone_offset, accept',
 }
 
 // ---------------------------------------------------------------------------
@@ -38,18 +38,27 @@ serve(async (req) => {
   }
 
   try {
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
-    )
-
     // Auth required — return 401 if no valid JWT
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) return error(401, 'Missing authorization header')
 
     const token = authHeader.replace('Bearer ', '')
-    const { data: { user } } = await supabase.auth.getUser(token)
+
+    // Use anon key + user token for auth verification
+    const supabaseAuth = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_ANON_KEY')!,
+      { global: { headers: { Authorization: `Bearer ${token}` } } },
+    )
+
+    const { data: { user } } = await supabaseAuth.auth.getUser()
     if (!user) return error(401, 'Invalid or expired token')
+
+    // Use service role for DB operations
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+    )
 
     const userId = user.id
     const url = new URL(req.url)

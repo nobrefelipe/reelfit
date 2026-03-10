@@ -29,12 +29,23 @@ class HistoryController {
     }
 
     history.emit(Loading());
-    history.emit(await _service.getHistory());
+    final result = await _service.getHistory();
+    if (result is Success<List<VideoModel>> && result.value.isEmpty) {
+      history.emit(Empty());
+    } else {
+      history.emit(result);
+    }
   }
 
   Future<void> refresh({bool showLoading = true}) async {
     if (showLoading) history.emit(Loading());
-    history.emit(await _service.getHistory());
+    final result = await _service.getHistory();
+    print('[history] refresh result: $result');
+    if (result is Success<List<VideoModel>> && result.value.isEmpty) {
+      history.emit(Empty());
+    } else {
+      history.emit(result);
+    }
   }
 
   Future<void> findByVideoId(String videoId) async {
