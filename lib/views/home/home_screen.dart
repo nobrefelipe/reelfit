@@ -45,10 +45,10 @@ class _HomeScreenState extends State<HomeScreen> {
     if (result is Success<VideoModel>) {
       final video = result.value;
       if (video.type == 'workout') {
-        context.push('/workout/${video.videoId}', extra: video);
+        context.go('/workout/${video.videoId}');
         extractController.reset();
       } else if (video.type == 'diet') {
-        context.push('/diet/${video.videoId}', extra: video);
+        context.go('/diet/${video.videoId}');
         extractController.reset();
       }
     } else if (result is Failure<VideoModel> && result.message == 'guest_limit') {
@@ -293,9 +293,9 @@ class _VideoCard extends StatelessWidget {
 
   void _navigate(BuildContext context) {
     if (video.type == 'workout') {
-      context.push('/workout/${video.videoId}', extra: video);
+      context.go('/workout/${video.videoId}');
     } else if (video.type == 'diet') {
-      context.push('/diet/${video.videoId}', extra: video);
+      context.go('/diet/${video.videoId}');
     }
   }
 

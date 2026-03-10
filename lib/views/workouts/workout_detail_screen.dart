@@ -1,16 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:reelfit/controllers/extract_controller.dart';
+import 'package:reelfit/controllers/history_controller.dart';
 import 'package:reelfit/core/ui/_theme.dart';
 import 'package:reelfit/core/ui/text.dart';
 import 'package:reelfit/models/exercise_model.dart';
 import 'package:reelfit/models/video_model.dart';
 import 'package:reelfit/models/workout_model.dart';
 
-class WorkoutDetailScreen extends StatelessWidget {
+class WorkoutDetailScreen extends StatefulWidget {
   const WorkoutDetailScreen({super.key, required this.videoId});
 
   final String videoId;
+
+  @override
+  State<WorkoutDetailScreen> createState() => _WorkoutDetailScreenState();
+}
+
+class _WorkoutDetailScreenState extends State<WorkoutDetailScreen> {
+  @override
+  void initState() {
+    super.initState();
+    historyController.findByVideoId(widget.videoId);
+  }
+
+  Widget _loadingScaffold() => Scaffold(
+    appBar: AppBar(title: UIKText.h4('Workout')),
+    body: const Center(child: CircularProgressIndicator()),
+  );
 
   Widget _noData(BuildContext context) => Scaffold(
     appBar: AppBar(title: UIKText.h4('Workout')),
@@ -19,23 +35,14 @@ class WorkoutDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final video = GoRouterState.of(context).extra as VideoModel?;
-    if (video != null) {
-      final workout = video.asWorkout;
-      if (workout == null) return _noData(context);
-      return _WorkoutContent(video: video, workout: workout, videoId: videoId);
-    }
-    return extractResult(
-      success: (v) {
-        final workout = v.asWorkout;
-        if (workout == null) return _noData(context);
-        return _WorkoutContent(video: v, workout: workout, videoId: videoId);
-      },
-      loading: () => Scaffold(
-        appBar: AppBar(title: UIKText.h4('Workout')),
-        body: const Center(child: CircularProgressIndicator()),
-      ),
+    return workout(
+      loading: _loadingScaffold,
       failure: (_) => _noData(context),
+      success: (video) {
+        final w = video.asWorkout;
+        if (w == null) return _noData(context);
+        return _WorkoutContent(video: video, workout: w, videoId: widget.videoId);
+      },
     );
   }
 }
@@ -90,9 +97,8 @@ class _WorkoutContent extends StatelessWidget {
               delegate: SliverChildBuilderDelegate(
                 (context, index) => _ExerciseCard(
                   exercise: workout.exercises[index],
-                  onTap: () => context.push(
-                    '/workout/$videoId/exercise',
-                    extra: workout.exercises[index],
+                  onTap: () => context.go(
+                    '/workout/$videoId/exercise/${Uri.encodeComponent(workout.exercises[index].name)}',
                   ),
                 ),
                 childCount: workout.exercises.length,

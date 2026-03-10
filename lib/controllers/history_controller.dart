@@ -8,6 +8,7 @@ import '../data/history_service.dart';
 import '../models/video_model.dart';
 
 final history = AsyncAtom<List<VideoModel>>();
+final workout = AsyncAtom<VideoModel>();
 
 class HistoryController {
   final _service = HistoryService();
@@ -35,6 +36,20 @@ class HistoryController {
   Future<void> refresh({bool showLoading = true}) async {
     if (showLoading) history.emit(Loading());
     history.emit(await _service.getHistory());
+  }
+
+  Future<void> findByVideoId(String videoId) async {
+    workout.emit(Loading());
+    if (history.value is! Success<List<VideoModel>>) await load();
+    final current = history.value;
+    if (current is Success<List<VideoModel>>) {
+      try {
+        final video = current.value.firstWhere((v) => v.videoId == videoId);
+        workout.emit(Success(video));
+        return;
+      } catch (_) {}
+    }
+    workout.emit(Failure('Video not found'));
   }
 
   /// Called after sign-in — migrates local guest videos to the user's DB account.

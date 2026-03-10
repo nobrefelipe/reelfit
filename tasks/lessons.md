@@ -59,6 +59,21 @@ count.emit(newCount);
 
 ## Routing
 
+**On Flutter Web, context.push() does not update the browser URL bar**
+`context.push()` stacks routes internally but the browser URL never changes.
+Use `context.go()` for any navigation that should update the URL.
+Only use `context.push()` for modal-style overlays where back navigation should return to the previous screen:
+```dart
+// wrong — URL stays the same in the browser
+context.push('/workout/${video.videoId}', extra: video);
+
+// correct — URL updates in the browser
+context.go('/workout/${video.videoId}', extra: video);
+
+// correct use of push — modal overlay, back button should return here
+context.push('/auth/pin-setup');
+```
+
 **Never use Navigator.of(context).pop() in a GoRouter app**
 Always use `context.pop()` from `go_router`:
 ```dart

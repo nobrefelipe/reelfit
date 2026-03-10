@@ -4,7 +4,6 @@ CREATE TABLE videos (
   url         TEXT PRIMARY KEY,
   type        TEXT NOT NULL CHECK (type IN ('workout', 'diet', 'unknown')),
   data        JSONB NOT NULL DEFAULT '{}',
-  transcript  TEXT,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 

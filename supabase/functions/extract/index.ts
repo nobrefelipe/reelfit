@@ -149,10 +149,19 @@ Unknown:
 { "type": "unknown", "data": {} }
 
 Rules:
-- Use null for any missing optional field
-- Cap exercises at 20 max
-- Cap steps at 20 max
-- Return ONLY the JSON object — no explanation, no markdown`
+- Use JSON null (never the string 'null') for truly unknown optional fields
+- Cap exercises at 20 max, steps at 20 max
+- Return ONLY the JSON object — no explanation, no markdown
+- For exercises, always try to infer missing values:
+  * sets: default to 3 if not mentioned, only null if clearly a one-off move
+  * reps: infer from exercise type if not stated —
+    strength moves (press, squat, deadlift, row, curl): 8-12
+    bodyweight/endurance (push-up, lunge, sit-up, raise): 15-20
+    isometric/timed (plank, wall sit, hold): set duration instead, null reps
+  * description: write 1-2 sentences on how to perform it using any
+    technique cues from the transcript — never use generic placeholder text,
+    use null if no cues exist
+  * notes: only real coaching cues from the transcript, null if none`
 
   const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
@@ -161,11 +170,11 @@ Rules:
       'content-type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'llama-3.1-8b-instant',
+      model: 'llama-3.3-70b-versatile',
       messages: [{ role: 'user', content: prompt }],
       response_format: { type: 'json_object' },
       temperature: 0.1,
-      max_tokens: 2048,
+      max_tokens: 4096,
     }),
   })
 
@@ -262,7 +271,7 @@ serve(async (req) => {
     const { data: saved } = await supabase
       .from('videos')
       .upsert(
-        { url, type: extracted.type, data: extracted.data, transcript },
+        { url, type: extracted.type, data: extracted.data },
         { onConflict: 'url', ignoreDuplicates: true },
       )
       .select('url, type, data, created_at')

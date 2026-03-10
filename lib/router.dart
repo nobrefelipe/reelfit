@@ -1,15 +1,14 @@
 import 'package:go_router/go_router.dart';
-import 'package:reelfit/models/exercise_model.dart';
 import 'package:reelfit/views/diet/diet_detail_screen.dart';
 import 'package:reelfit/views/home/home_screen.dart';
 import 'package:reelfit/views/workouts/exercise_detail_screen.dart';
 import 'package:reelfit/views/workouts/workout_detail_screen.dart';
 
 final router = GoRouter(
-  initialLocation: '/home',
+  initialLocation: '/',
   routes: [
     GoRoute(
-      path: '/home',
+      path: '/',
       builder: (_, __) => const HomeScreen(),
     ),
     GoRoute(
@@ -18,9 +17,11 @@ final router = GoRouter(
           WorkoutDetailScreen(videoId: state.pathParameters['videoId']!),
       routes: [
         GoRoute(
-          path: 'exercise',
-          builder: (_, state) =>
-              ExerciseDetailScreen(exercise: state.extra as ExerciseModel),
+          path: 'exercise/:exerciseName',
+          builder: (_, state) => ExerciseDetailScreen(
+            videoId: state.pathParameters['videoId']!,
+            exerciseName: Uri.decodeComponent(state.pathParameters['exerciseName']!),
+          ),
         ),
       ],
     ),
