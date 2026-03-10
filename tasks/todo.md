@@ -133,7 +133,7 @@
 ### 2.3 Controllers
 > Atom defined at top of file. Global variable. Never created inside a widget or method. No try/catch. No BuildContext.
 
-- [ ] Create `controllers/extract_controller.dart`
+- [x] Create `controllers/extract_controller.dart`
   - `extractResult = AsyncAtom<VideoModel>()`
   - `guestCount = Atom(0)`
   - `isGuest` getter — checks `authState`
@@ -142,18 +142,18 @@
   - `extract(String url)` — blocks + emits `Failure('guest_limit')` if limit reached; saves to local if guest; refreshes history if authenticated
   - `reset()` — emits `Idle()`
 
-- [ ] Create `controllers/history_controller.dart`
+- [x] Create `controllers/history_controller.dart`
   - `history = AsyncAtom<List<VideoModel>>()`
   - `load()` — local storage path for guest, DB path for authenticated, cache-first
   - `refresh({bool showLoading = true})`
   - `migrateLocalVideos()` — links each local URL to DB, clears local storage
 
-- [ ] Create `controllers/progress_controller.dart`
+- [x] Create `controllers/progress_controller.dart`
   - `progress = AsyncAtom<List<ProgressModel>>()`
   - `load(String exerciseName)`
   - `log({required String exerciseName, required double value, required String unit})` → returns `Result<ProgressModel>`, silently reloads chart on success
 
-- [ ] Run `flutter analyze` — fix any issues
+- [x] Run `flutter analyze` — fix any issues
 
 ### 2.4 Routing
 - [ ] Read `router.dart` before editing
