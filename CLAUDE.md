@@ -256,6 +256,32 @@ if (result is Success) {
 }
 ```
 
+## Widget Organisation
+Every view file (screen) must only contain the screen class itself 
+and its state class. All supporting widgets must live in a 
+widgets/ subfolder under the same feature folder.
+
+```
+Example structure:
+  views/workouts/
+    workout_detail_screen.dart       ← screen only
+    exercise_detail_screen.dart      ← screen only
+    widgets/
+      exercise_card.dart
+      hero_image.dart
+      stats_row.dart
+      muscle_chip.dart
+      progress_chart.dart
+      progress_section.dart
+      guest_progress_prompt.dart
+```
+Rules:
+- One widget class per file
+- File name matches the widget name in snake_case
+- No private widgets prefixed with _ in widget files — 
+  they are already scoped by being in their own file
+- Screen files import from widgets/ subfolder
+
 ## Services
 
 Services extend `APIRequest` (from `core/http/api_request.dart`) and return `Result<T>`. No logic — just HTTP. One file per feature in `lib/data/`.
