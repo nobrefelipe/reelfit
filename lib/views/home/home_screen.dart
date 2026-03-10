@@ -78,8 +78,17 @@ class _HomeScreenState extends State<HomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           if (extractController.isGuest)
-            guestCount(
-              (count) => count > 0 ? GuestCounterBanner(used: count) : const SizedBox.shrink(),
+            guestBannerDismissed(
+              (dismissed) => dismissed
+                  ? const SizedBox.shrink()
+                  : guestCount(
+                      (count) => count > 0
+                          ? GuestCounterBanner(
+                              used: count,
+                              onDismiss: () => guestBannerDismissed.emit(true),
+                            )
+                          : const SizedBox.shrink(),
+                    ),
             )
           else
             const SizedBox.shrink(),

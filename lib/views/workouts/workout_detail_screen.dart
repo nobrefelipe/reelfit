@@ -9,6 +9,7 @@ import 'package:reelfit/models/workout_model.dart';
 import 'widgets/chip_row.dart';
 import 'widgets/difficulty_badge.dart';
 import 'widgets/exercise_card.dart';
+import 'widgets/workout_skeleton.dart';
 
 class WorkoutDetailScreen extends StatefulWidget {
   const WorkoutDetailScreen({super.key, required this.videoId});
@@ -23,13 +24,10 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen> {
   @override
   void initState() {
     super.initState();
-    historyController.findByVideoId(widget.videoId);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      historyController.findByVideoId(widget.videoId);
+    });
   }
-
-  Widget _loadingScaffold() => Scaffold(
-    appBar: AppBar(title: UIKText.h4('Workout')),
-    body: const Center(child: CircularProgressIndicator()),
-  );
 
   Widget _noData(BuildContext context) => Scaffold(
     appBar: AppBar(title: UIKText.h4('Workout')),
@@ -39,7 +37,7 @@ class _WorkoutDetailScreenState extends State<WorkoutDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return workout(
-      loading: _loadingScaffold,
+      loading: () => const WorkoutSkeleton(),
       failure: (_) => _noData(context),
       success: (video) {
         final w = video.asWorkout;

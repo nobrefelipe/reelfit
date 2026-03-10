@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import '../../../core/ui/text.dart';
 
 class GuestCounterBanner extends StatelessWidget {
-  const GuestCounterBanner({super.key, required this.used});
+  const GuestCounterBanner({super.key, required this.used, required this.onDismiss});
 
   final int used;
+  final VoidCallback onDismiss;
 
   @override
   Widget build(BuildContext context) {
@@ -16,12 +17,19 @@ class GuestCounterBanner extends StatelessWidget {
         : Theme.of(context).colorScheme.primary;
     return Container(
       color: color.withValues(alpha: 0.1),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: const EdgeInsets.fromLTRB(16, 8, 4, 8),
       child: Row(
         children: [
           Icon(Icons.info_outline, size: 16, color: color),
           const SizedBox(width: 8),
-          UIKText.small('$used/3 free extracts used', color: color),
+          Expanded(child: UIKText.small('$used/3 free extracts used', color: color)),
+          IconButton(
+            icon: Icon(Icons.close, size: 16, color: color),
+            onPressed: onDismiss,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+            visualDensity: VisualDensity.compact,
+          ),
         ],
       ),
     );

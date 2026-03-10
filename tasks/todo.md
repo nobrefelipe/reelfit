@@ -157,17 +157,17 @@
 ## Phase 4 — Polish
 
 ### 4.1 Empty & error states
-- [ ] HomeScreen — empty state when no videos yet
-- [ ] ExerciseDetailScreen — empty chart state for guests
-- [ ] ExtractSheet — clear error for invalid URLs
+- [x] HomeScreen — empty state when no videos yet
+- [x] ExerciseDetailScreen — empty chart state for guests
+- [x] ExtractSheet — clear error for invalid URLs
 
 ### 4.2 Skeleton loaders
-- [ ] HomeScreen video list skeleton (3 placeholder cards)
-- [ ] WorkoutDetailScreen skeleton while extractResult is Loading()
+- [x] HomeScreen video list skeleton (3 placeholder cards)
+- [x] WorkoutDetailScreen skeleton while extractResult is Loading()
 
 ### 4.3 Guest upsell polish
-- [ ] Guest counter banner dismissible per session — `Atom<bool>` for dismissed state
-- [ ] Counter colour: primary → amber at 2/3 → red at 3/3
+- [x] Guest counter banner dismissible per session — `Atom<bool>` for dismissed state
+- [x] Counter colour: primary → amber at 2/3 → red at 3/3
 
 ### 4.4 PWA config
 - [ ] `manifest.json` in `web/`

@@ -33,6 +33,7 @@ class _ExtractContent extends StatefulWidget {
 
 class _ExtractContentState extends State<_ExtractContent> {
   final _urlController = TextEditingController();
+  String? _errorText;
 
   @override
   void initState() {
@@ -62,9 +63,21 @@ class _ExtractContentState extends State<_ExtractContent> {
     }
   }
 
+  bool _isValidShortsUrl(String url) {
+    return url.contains('youtube.com/shorts') || url.contains('youtu.be');
+  }
+
   void _extract() {
     final url = _urlController.text.trim();
-    if (url.isEmpty) return;
+    if (url.isEmpty) {
+      setState(() => _errorText = 'Please paste a URL');
+      return;
+    }
+    if (!_isValidShortsUrl(url)) {
+      setState(() => _errorText = 'Please paste a valid YouTube Shorts URL');
+      return;
+    }
+    setState(() => _errorText = null);
     extractController.extract(url);
   }
 
@@ -76,6 +89,7 @@ class _ExtractContentState extends State<_ExtractContent> {
         idle: () => _ExtractBody(
           urlController: _urlController,
           onExtract: _extract,
+          errorText: _errorText,
         ),
         loading: () => _ExtractBody(
           urlController: _urlController,
@@ -89,6 +103,7 @@ class _ExtractContentState extends State<_ExtractContent> {
         failure: (_) => _ExtractBody(
           urlController: _urlController,
           onExtract: _extract,
+          errorText: _errorText,
         ),
         empty: () => _ExtractBody(
           urlController: _urlController,
@@ -104,11 +119,13 @@ class _ExtractBody extends StatelessWidget {
     required this.urlController,
     required this.onExtract,
     this.isLoading = false,
+    this.errorText,
   });
 
   final TextEditingController urlController;
   final VoidCallback onExtract;
   final bool isLoading;
+  final String? errorText;
 
   @override
   Widget build(BuildContext context) {
@@ -123,9 +140,10 @@ class _ExtractBody extends StatelessWidget {
           keyboardType: TextInputType.url,
           textInputAction: TextInputAction.go,
           onSubmitted: (_) => onExtract(),
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             hintText: 'Paste YouTube Shorts URL',
-            border: OutlineInputBorder(),
+            border: const OutlineInputBorder(),
+            errorText: errorText,
           ),
         ),
         const SizedBox(height: 16),

@@ -31,10 +31,12 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   void initState() {
     super.initState();
     authState.addListener(_onAuthChanged);
-    historyController.findByVideoId(widget.videoId);
-    if (!extractController.isGuest) {
-      progressController.load(widget.exerciseName);
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      historyController.findByVideoId(widget.videoId);
+      if (!extractController.isGuest) {
+        progressController.load(widget.exerciseName);
+      }
+    });
   }
 
   @override

@@ -38,7 +38,7 @@ class HistoryController {
   }
 
   Future<void> findByVideoId(String videoId) async {
-    workout.emit(Loading());
+    await Future.microtask(() => workout.emit(Loading()));
     if (history.value is! Success<List<VideoModel>>) await load();
     final current = history.value;
     if (current is Success<List<VideoModel>>) {

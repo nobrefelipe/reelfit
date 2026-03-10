@@ -12,6 +12,7 @@ const _guestVideoLimit = 3;
 
 final extractResult = AsyncAtom<VideoModel>();
 final guestCount = Atom<int>(0);
+final guestBannerDismissed = Atom<bool>(false);
 
 class ExtractController {
   final _service = ExtractService();
@@ -20,7 +21,7 @@ class ExtractController {
     guestCount.emit(AppCache().getGuestVideoCount());
   }
 
-  bool get isGuest => false;
+  bool get isGuest => authState.value is! Authenticated;
 
   bool get hasReachedGuestLimit => isGuest && guestCount.value >= _guestVideoLimit;
 

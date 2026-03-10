@@ -198,6 +198,42 @@ Future<Result<VideoModel>> extract({required String url}) =>
 
 ## Code Quality
 
+**Always wrap initState controller calls in addPostFrameCallback**
+Controller methods called from `initState` that emit to atoms synchronously can trigger
+`setState during build` errors. Wrap them in `WidgetsBinding.instance.addPostFrameCallback`:
+```dart
+// wrong — may fire synchronously during the first build
+void initState() {
+  super.initState();
+  historyController.findByVideoId(widget.videoId);
+}
+
+// correct — deferred until after the first frame
+void initState() {
+  super.initState();
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    historyController.findByVideoId(widget.videoId);
+  });
+}
+```
+If the controller method itself calls `emit(Loading())` synchronously before any `await`,
+also add a microtask delay to that emit so it never fires inline:
+```dart
+// wrong — emits synchronously, can cause setState during build
+Future<void> findByVideoId(String videoId) async {
+  workout.emit(Loading());
+  ...
+}
+
+// correct — deferred to next microtask
+Future<void> findByVideoId(String videoId) async {
+  await Future.microtask(() => workout.emit(Loading()));
+  ...
+}
+```
+
+---
+
 **Never suppress warnings with // ignore: unawaited_futures**
 Fix the underlying issue by adding `await`:
 ```dart
