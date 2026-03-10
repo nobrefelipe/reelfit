@@ -156,21 +156,21 @@
 - [x] Run `flutter analyze` — fix any issues
 
 ### 2.4 Routing
-- [ ] Read `router.dart` before editing
-- [ ] Add routes:
+- [x] Read `router.dart` before editing
+- [x] Add routes:
   - `/home` → `HomeScreen`
   - `/workout/:videoId` → `WorkoutDetailScreen`
   - `/workout/:videoId/exercise` → `ExerciseDetailScreen` (exercise via `state.extra`)
   - `/diet/:videoId` → `DietDetailScreen`
-- [ ] Default route should be `/home` — no auth redirect on app start
-- [ ] Run `flutter analyze` — fix any issues
+- [x] Default route should be `/home` — no auth redirect on app start
+- [x] Run `flutter analyze` — fix any issues
 
 ---
 
 ## Phase 3 — UI
 
 ### 3.1 Login / Sign-in sheet
-- [ ] Create `views/auth/sign_in_sheet.dart` — bottom sheet (not a full screen)
+- [x] Create `views/auth/sign_in_sheet.dart` — bottom sheet (not a full screen)
   - Title and subtitle passed as parameters (different upsell contexts use different copy)
   - `UIKButton` "Continue with Google" → calls `authController.signInWithGoogle()`
   - Dismiss button
