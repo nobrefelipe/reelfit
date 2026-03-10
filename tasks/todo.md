@@ -177,7 +177,7 @@
   - Use `UIKitBottomSheet.show()` — never `showModalBottomSheet` directly
 
 ### 3.2 HomeScreen
-- [ ] Create `views/home/home_screen.dart`
+- [x] Create `views/home/home_screen.dart`
   - Two tabs: Extract / History
   - **Extract tab:**
     - URL text input (use form builder or raw field — check CLAUDE.md rule)
