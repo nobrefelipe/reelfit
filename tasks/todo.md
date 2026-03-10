@@ -117,18 +117,18 @@
 ### 2.2 Services
 > All services extend `APIRequest`. Arrow syntax only. No async/await. No logic. Document each method with HTTP verb and path.
 
-- [ ] Create `data/extract_service.dart`
+- [x] Create `data/extract_service.dart`
   - `extract({required String url})` → `authPost('/functions/v1/extract', VideoModel.fromJson, body: {'url': url})`
 
-- [ ] Create `data/history_service.dart`
+- [x] Create `data/history_service.dart`
   - `getHistory()` → `authGet('/functions/v1/history', VideoModel.fromJsonToList)`
-  - `linkVideo({required String url})` → `authPost('/functions/v1/history/link', ...)`
+  - `linkVideo({required String url})` → `authPost('/functions/v1/history/link', VideoModel.fromJson, body: {'url': url})`
 
-- [ ] Create `data/progress_service.dart`
-  - `getProgress({required String exerciseName})` → `authGet(...)`
-  - `logProgress({required String exerciseName, required double value, required String unit})` → `authPost(...)`
+- [x] Create `data/progress_service.dart`
+  - `getProgress({required String exerciseName})` → `authGet('/functions/v1/progress?exercise=$exerciseName', ProgressModel.fromJsonToList)`
+  - `logProgress({required String exerciseName, required double value, required String unit})` → `authPost('/functions/v1/progress', ProgressModel.fromJson, body: {...})`
 
-- [ ] Run `flutter analyze` — fix any issues
+- [x] Run `flutter analyze` — fix any issues
 
 ### 2.3 Controllers
 > Atom defined at top of file. Global variable. Never created inside a widget or method. No try/catch. No BuildContext.
