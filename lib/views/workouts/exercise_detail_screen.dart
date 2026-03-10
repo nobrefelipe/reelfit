@@ -1,3 +1,4 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 import '../../controllers/extract_controller.dart';
@@ -86,13 +87,6 @@ class _ExerciseContent extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: UIKText.h4(exercise.name),
-        actions: [
-          if (!isGuest)
-            IconButton(
-              icon: const Icon(Icons.add),
-              onPressed: () => LogProgressSheet.show(context, exercise: exercise),
-            ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -117,7 +111,11 @@ class _ExerciseContent extends StatelessWidget {
               UIKText.body(exercise.notes!),
               const SizedBox(height: 20),
             ],
-            _ProgressSection(exercise: exercise, isGuest: isGuest),
+            _ProgressSection(
+              exercise: exercise,
+              isGuest: isGuest,
+              onAdd: isGuest ? null : () => LogProgressSheet.show(context, exercise: exercise),
+            ),
           ],
         ),
       ),
@@ -235,10 +233,11 @@ class _MuscleChip extends StatelessWidget {
 }
 
 class _ProgressSection extends StatelessWidget {
-  const _ProgressSection({required this.exercise, required this.isGuest});
+  const _ProgressSection({required this.exercise, required this.isGuest, this.onAdd});
 
   final ExerciseModel exercise;
   final bool isGuest;
+  final VoidCallback? onAdd;
 
   @override
   Widget build(BuildContext context) {
@@ -249,10 +248,22 @@ class _ProgressSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        UIKText.h5('Progress'),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            UIKText.h5('Progress'),
+            if (onAdd != null)
+              IconButton(
+                icon: const Icon(Icons.add),
+                onPressed: onAdd,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+              ),
+          ],
+        ),
         const SizedBox(height: 12),
         progress(
-          success: _ProgressList.new,
+          success: _ProgressChart.new,
           loading: () => const Center(child: CircularProgressIndicator()),
           empty: () => UIKText.body('No progress logged yet'),
           idle: () => const SizedBox.shrink(),
@@ -302,34 +313,115 @@ class _GuestProgressPrompt extends StatelessWidget {
   }
 }
 
-class _ProgressList extends StatelessWidget {
-  const _ProgressList(this.entries);
+class _ProgressChart extends StatelessWidget {
+  const _ProgressChart(this.entries);
 
   final List<ProgressModel> entries;
 
+  static const _dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+  String _dayLabel(DateTime dt) => _dayNames[dt.weekday - 1];
+
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: entries.length,
-      separatorBuilder: (_, __) => const Divider(height: 1),
-      itemBuilder: (_, index) {
-        final entry = entries[index];
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              UIKText.body(
-                '${entry.loggedAt.day}/${entry.loggedAt.month}/${entry.loggedAt.year}',
-                color: Theme.of(context).onSurfaceColor.withAlpha(150),
-              ),
-              UIKText.h6('${entry.value} ${entry.unit}'),
-            ],
+    final primary = DesignTokens.primary;
+    final surface = Theme.of(context).surfaceColor;
+    final onSurface = Theme.of(context).onSurfaceColor;
+    final latest = entries.last;
+
+    // Single entry: duplicate point to draw a visible flat line
+    final spots = entries.length == 1
+        ? [FlSpot(0, entries.first.value), FlSpot(1, entries.first.value)]
+        : [for (int i = 0; i < entries.length; i++) FlSpot(i.toDouble(), entries[i].value)];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            UIKText.h5('My Progress'),
+            UIKText.h5(
+              '${latest.value % 1 == 0 ? latest.value.toInt() : latest.value}${latest.unit}',
+              color: primary,
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Container(
+          height: 180,
+          padding: const EdgeInsets.fromLTRB(8, 16, 16, 8),
+          decoration: BoxDecoration(
+            color: surface,
+            borderRadius: BorderRadius.circular(DesignTokens.buttonBorderRadius),
+            boxShadow: DesignTokens.defaultShadow,
           ),
-        );
-      },
+          child: LineChart(
+            LineChartData(
+              gridData: const FlGridData(show: false),
+              borderData: FlBorderData(show: false),
+              lineTouchData: const LineTouchData(enabled: false),
+              titlesData: FlTitlesData(
+                topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                leftTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    reservedSize: 40,
+                    getTitlesWidget: (value, meta) => Align(
+                      alignment: Alignment.centerRight,
+                      child: Text(
+                        value.toStringAsFixed(0),
+                        style: TextStyle(fontSize: 10, color: onSurface.withAlpha(120)),
+                      ),
+                    ),
+                  ),
+                ),
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    reservedSize: 24,
+                    getTitlesWidget: (value, meta) {
+                      // For single entry we show 2 spots — only label index 0
+                      if (entries.length == 1 && value == 1) return const SizedBox.shrink();
+                      final idx = value.round().clamp(0, entries.length - 1);
+                      return Text(
+                        _dayLabel(entries[idx].loggedAt),
+                        style: TextStyle(fontSize: 10, color: onSurface.withAlpha(120)),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              lineBarsData: [
+                LineChartBarData(
+                  spots: spots,
+                  isCurved: entries.length > 2,
+                  color: primary,
+                  barWidth: 2.5,
+                  belowBarData: BarAreaData(
+                    show: true,
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [primary.withAlpha(100), primary.withAlpha(0)],
+                    ),
+                  ),
+                  dotData: FlDotData(
+                    show: true,
+                    getDotPainter: (spot, percent, bar, index) => FlDotCirclePainter(
+                      radius: 4,
+                      color: primary,
+                      strokeWidth: 2,
+                      strokeColor: surface,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

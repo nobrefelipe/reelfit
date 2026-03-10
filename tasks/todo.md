@@ -124,23 +124,23 @@
 - [x] Run flutter analyze after
 
 ### 3.5 ExerciseDetailScreen
-- [ ] Read existing file before editing
-- [ ] On mount: call `progressController.load(exercise.name)` if authenticated
-- [ ] Wire progress chart to real `progress` atom
+- [x] Read existing file before editing
+- [x] On mount: call `progressController.load(exercise.name)` if authenticated
+- [x] Wire progress chart to real `progress` atom
   - `Loading()` → shimmer
   - `Success(entries)` → chart
   - `Empty()` → empty state with sign-in prompt if guest
-- [ ] Guest: empty chart + SignInSheet trigger instead of "+" button
-- [ ] Authenticated: "+" button → LogProgressSheet
-- [ ] Run flutter analyze after
+- [x] Guest: empty chart + SignInSheet trigger instead of "+" button
+- [x] Authenticated: "+" button → LogProgressSheet
+- [x] Run flutter analyze after
 
 ### 3.6 LogProgressSheet
-- [ ] Create `views/workouts/log_progress_sheet.dart`
-- [ ] Number input for value
-- [ ] Unit selector (kg / lbs / reps) — `Atom<String>` for selected unit
-- [ ] "Save" → `progressController.log(...)` → dismiss + success snackbar
-- [ ] UIKitBottomSheet.show() — never showModalBottomSheet directly
-- [ ] Run flutter analyze after
+- [x] Create `views/workouts/log_progress_sheet.dart`
+- [x] Number input for value
+- [x] Unit selector (kg / lbs / reps) — `Atom<String>` for selected unit
+- [x] "Save" → `progressController.log(...)` → dismiss + success snackbar
+- [x] UIKitBottomSheet.show() — never showModalBottomSheet directly
+- [x] Run flutter analyze after
 
 ### 3.7 DietDetailScreen
 - [ ] Create `views/diet/diet_detail_screen.dart`

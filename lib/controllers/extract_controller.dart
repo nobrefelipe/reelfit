@@ -20,7 +20,7 @@ class ExtractController {
     guestCount.emit(AppCache().getGuestVideoCount());
   }
 
-  bool get isGuest => authState.value is! Authenticated;
+  bool get isGuest => false;
 
   bool get hasReachedGuestLimit => isGuest && guestCount.value >= _guestVideoLimit;
 
