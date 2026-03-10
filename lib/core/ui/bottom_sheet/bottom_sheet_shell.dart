@@ -96,7 +96,7 @@ class _Header extends StatelessWidget {
       children: [
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 3),
+            padding: const EdgeInsets.only(top: 45),
             child: UIKText.h5(title),
           ),
         ),

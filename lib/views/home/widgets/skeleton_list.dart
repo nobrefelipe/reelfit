@@ -28,7 +28,7 @@ class SkeletonCard extends StatelessWidget {
               width: 72,
               height: 54,
               decoration: BoxDecoration(
-                color: Colors.grey.shade300,
+                color: Colors.black38,
                 borderRadius: BorderRadius.circular(6),
               ),
             ),
@@ -41,7 +41,7 @@ class SkeletonCard extends StatelessWidget {
                     height: 14,
                     width: 64,
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
+                      color: Colors.black45,
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
@@ -49,7 +49,7 @@ class SkeletonCard extends StatelessWidget {
                   Container(
                     height: 12,
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade200,
+                      color: Colors.black38,
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),

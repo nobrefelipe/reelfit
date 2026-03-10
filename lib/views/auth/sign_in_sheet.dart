@@ -60,7 +60,6 @@ class _SignInContent extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 8),
       child: UIKText.body(
         subtitle,
-        textAlign: TextAlign.center,
         color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
       ),
     );

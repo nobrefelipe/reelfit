@@ -72,7 +72,7 @@ class _AppButtonState extends State<AppButton> with LoadingStateMixin {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       if (widget.leftIcon != null) ...[widget.leftIcon!, const SizedBox(width: 8)],
-                      UIKText.body(widget.label),
+                      UIKText.body(widget.label, color: textStyle.color),
                       if (widget.rightIcon != null) ...[const SizedBox(width: 8), widget.rightIcon!],
                     ],
                   ),
@@ -98,7 +98,7 @@ class _AppButtonState extends State<AppButton> with LoadingStateMixin {
       ButtonType.primary => colors.primary,
       ButtonType.secondary => colors.surface,
       ButtonType.destructive => colors.error,
-      ButtonType.ghost => Colors.transparent,
+      ButtonType.ghost => Colors.white.withOpacity(0.05),
     };
   }
 

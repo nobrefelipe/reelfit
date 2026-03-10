@@ -13,6 +13,7 @@ import '../auth/widgets/sign_in_button.dart';
 import 'extract_sheet.dart';
 import 'widgets/empty_state.dart';
 import 'widgets/guest_counter_banner.dart';
+import 'widgets/sign_in_banner.dart';
 import 'widgets/skeleton_list.dart';
 import 'widgets/video_list.dart';
 
@@ -92,6 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
             )
           else
             const SizedBox.shrink(),
+          if (extractController.isGuest) const SignInBanner(),
           Expanded(
             child: history(
               loading: () => const SkeletonList(),
