@@ -62,11 +62,11 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
       failure: (_) => _noData(context),
       success: (video) {
         final w = video.asWorkout;
-        final exercise = w?.exercises.firstWhere(
+        if (w == null) return _noData(context);
+        final exercise = w.exercises.firstWhere(
           (e) => e.name == widget.exerciseName,
-          orElse: () => w!.exercises.first,
+          orElse: () => w.exercises.first,
         );
-        if (exercise == null) return _noData(context);
         return _ExerciseContent(exercise: exercise, videoId: widget.videoId);
       },
     );
