@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:reelfit/views/auth/auth_callback_screen.dart';
 import 'package:reelfit/views/diet/diet_detail_screen.dart';
 import 'package:reelfit/views/home/home_screen.dart';
 import 'package:reelfit/views/workouts/exercise_detail_screen.dart';
@@ -10,6 +11,10 @@ final router = GoRouter(
     GoRoute(
       path: '/',
       builder: (_, __) => const HomeScreen(),
+    ),
+    GoRoute(
+      path: '/auth/callback',
+      builder: (context, state) => const AuthCallbackScreen(),
     ),
     GoRoute(
       path: '/workout/:videoId',
