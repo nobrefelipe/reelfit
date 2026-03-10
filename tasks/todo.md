@@ -66,18 +66,18 @@
 - [x] Deploy: `supabase functions deploy extract`
 
 ### 1.8 Edge Function — `history`
-- [ ] Create `supabase/functions/history/index.ts`
-- [ ] Auth required — return 401 if no valid JWT
-- [ ] `GET` → query `user_videos` joined with `videos`, ordered by `saved_at DESC`, limit 50
-- [ ] `POST /history/link` → insert a `user_videos` row (used for guest migration)
-- [ ] Test locally + deploy
+- [x] Create `supabase/functions/history/index.ts`
+- [x] Auth required — return 401 if no valid JWT
+- [x] `GET` → query `user_videos` joined with `videos`, ordered by `saved_at DESC`, limit 50
+- [x] `POST /history/link` → insert a `user_videos` row (used for guest migration)
+- [x] Test locally + deploy
 
 ### 1.9 Edge Function — `progress`
-- [ ] Create `supabase/functions/progress/index.ts`
-- [ ] Auth required — return 401 if no valid JWT
-- [ ] `GET ?exercise={name}` → query `progress` for this user + exercise, ordered by `logged_at ASC`
-- [ ] `POST` → insert a new `progress` row, return the created row
-- [ ] Test locally + deploy
+- [x] Create `supabase/functions/progress/index.ts`
+- [x] Auth required — return 401 if no valid JWT
+- [x] `GET ?exercise={name}` → query `progress` for this user + exercise, ordered by `logged_at ASC`
+- [x] `POST` → insert a new `progress` row, return the created row
+- [x] Test locally + deploy
 
 ---
 
@@ -86,33 +86,33 @@
 ### 2.1 Models
 > All models: use `Helper.get*()` — never raw casts. `fromJson` accepts `dynamic`. Always include `toString()`.
 
-- [ ] Create `models/video_model.dart`
+- [x] Create `models/video_model.dart`
   - Fields: `url`, `type`, `data`, `createdAt`, `cached`
   - Computed: `videoId` (regex from url), `thumbnailUrl` (i.ytimg.com)
   - Getters: `asWorkout`, `asDiet`
   - `fromJson`, `fromJsonToList`
 
-- [ ] Create `models/exercise_model.dart`
+- [x] Create `models/exercise_model.dart`
   - Fields: `name`, `sets?`, `reps?`, `duration?`, `rest?`, `notes?`, `description`, `targetMuscleGroup`, `timestampSeconds?`, `imageUrl?`
   - `fromJson`, `fromJsonToList`
 
-- [ ] Create `models/workout_model.dart`
+- [x] Create `models/workout_model.dart`
   - Fields: `url`, `exercises`, `suggestedPlan?`, `targetMuscleGroups`, `difficulty?`, `equipment`
   - `fromJson`
 
-- [ ] Create `models/diet_model.dart`
+- [x] Create `models/diet_model.dart`
   - Fields: `title`, `ingredients`, `steps`, `nutrition?`, `prepTime?`, `cookTime?`, `servings?`, `url`
   - `fromJson`
 
-- [ ] Create `models/ingredient_model.dart`
+- [x] Create `models/ingredient_model.dart`
   - Fields: `item`, `quantity?`
   - `fromJson`, `fromJsonToList`
 
-- [ ] Create `models/progress_model.dart`
+- [x] Create `models/progress_model.dart`
   - Fields: `id`, `exerciseName`, `value`, `unit`, `loggedAt`
   - `fromJson`, `fromJsonToList`
 
-- [ ] Run `flutter analyze` — fix any issues
+- [x] Run `flutter analyze` — fix any issues
 
 ### 2.2 Services
 > All services extend `APIRequest`. Arrow syntax only. No async/await. No logic. Document each method with HTTP verb and path.
