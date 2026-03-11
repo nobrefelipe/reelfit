@@ -257,6 +257,11 @@ serve(async (req) => {
     // 5. Groq / Llama 3.1 extraction
     const extracted = await extractWithGroq(transcript)
 
+    // 5b. Reject non-fitness content
+    if (extracted.type === 'unknown') {
+      return error(422, 'This video doesn\'t appear to contain a workout. Try a fitness Short.')
+    }
+
     // 6. Enrich exercises with YouTube thumbnail
     if (extracted.type === 'workout' && Array.isArray(extracted.data.exercises)) {
       const thumb = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`

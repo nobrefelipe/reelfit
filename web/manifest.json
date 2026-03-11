@@ -1,11 +1,11 @@
 {
-    "name": "reelfit",
-    "short_name": "reelfit",
+    "name": "ReelFit",
+    "short_name": "ReelFit",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#0f0f1a",
+    "theme_color": "#7C3AED",
+    "description": "Turn any YouTube fitness Short into a structured, trackable workout.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
