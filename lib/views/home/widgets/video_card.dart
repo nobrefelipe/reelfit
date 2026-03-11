@@ -11,9 +11,9 @@ class VideoCard extends StatelessWidget {
 
   void _navigate(BuildContext context) {
     if (video.type == 'workout') {
-      context.go('/workout/${video.videoId}');
+      context.push('/workout/${video.videoId}');
     } else if (video.type == 'diet') {
-      context.go('/diet/${video.videoId}');
+      context.push('/diet/${video.videoId}');
     }
   }
 

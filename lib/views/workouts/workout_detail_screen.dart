@@ -98,7 +98,7 @@ class _WorkoutContent extends StatelessWidget {
               delegate: SliverChildBuilderDelegate(
                 (context, index) => ExerciseCard(
                   exercise: workout.exercises[index],
-                  onTap: () => context.go(
+                  onTap: () => context.push(
                     '/workout/$videoId/exercise/${Uri.encodeComponent(workout.exercises[index].name)}',
                   ),
                 ),
@@ -123,6 +123,16 @@ class _Header extends StatelessWidget {
     return SliverAppBar(
       expandedHeight: 220,
       pinned: true,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        onPressed: () {
+          if (context.canPop()) {
+            context.pop();
+          } else {
+            context.go('/');
+          }
+        },
+      ),
       title: UIKText.h4('Workout'),
       flexibleSpace: FlexibleSpaceBar(
         background: Stack(

@@ -1,0 +1,24 @@
+<!-- Step 2: Find - Phone with copy/share gesture, no YouTube branding -->
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Phone -->
+  <rect x="55" y="15" width="76" height="130" rx="12" fill="#2a2a3e" stroke="#7C3AED" stroke-width="2"/>
+  <rect x="63" y="26" width="60" height="100" rx="6" fill="#111"/>
+  <!-- Video playing on screen -->
+  <rect x="63" y="26" width="60" height="55" rx="4" fill="#7C3AED" opacity="0.2"/>
+  <polygon points="83,48 83,62 97,55" fill="#7C3AED"/>
+  <!-- Progress bar -->
+  <rect x="68" y="84" width="50" height="3" rx="1.5" fill="#333"/>
+  <rect x="68" y="84" width="28" height="3" rx="1.5" fill="#7C3AED"/>
+  <!-- Text lines below video -->
+  <rect x="68" y="94" width="44" height="4" rx="2" fill="#444"/>
+  <rect x="68" y="103" width="34" height="3" rx="1.5" fill="#333"/>
+  <!-- Share/copy button highlighted -->
+  <rect x="63" y="112" width="60" height="8" rx="4" fill="#7C3AED" opacity="0.15" stroke="#7C3AED" stroke-width="1"/>
+  <text x="76" y="119" font-size="7" fill="#7C3AED">⬆  Share / Copy link</text>
+  <!-- Floating copy indicator -->
+  <rect x="128" y="55" width="52" height="22" rx="6" fill="#7C3AED"/>
+  <text x="136" y="70" font-size="10" font-weight="bold" fill="white">Copied!</text>
+  <!-- Arrow from phone to badge -->
+  <line x1="131" y1="66" x2="119" y2="66" stroke="#7C3AED" stroke-width="1.5" stroke-dasharray="3 2"/>
+  <polygon points="120,63 114,66 120,69" fill="#7C3AED"/>
+</svg>

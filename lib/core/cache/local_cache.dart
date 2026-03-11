@@ -204,4 +204,14 @@ class AppCache extends ICache {
     await SharedPreferencesSingleton().remove('guest_video_count');
     await SharedPreferencesSingleton().remove('guest_videos');
   }
+
+  // ─── Onboarding ──────────────────────────────────────────────────────────────
+
+  bool getHasSeenOnboarding() {
+    return SharedPreferencesSingleton().get('has_seen_onboarding', defaultValue: false) ?? false;
+  }
+
+  Future<void> setHasSeenOnboarding(bool value) {
+    return SharedPreferencesSingleton().set('has_seen_onboarding', value);
+  }
 }
