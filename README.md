@@ -4,6 +4,8 @@
 
 Paste a YouTube Shorts URL. Get back a clean breakdown of every exercise — sets, reps, muscle groups, descriptions — or a full recipe with ingredients and macros. No account required to try it.
 
+🚀 **Live app:** [ReelFit](https://reelfit-d5c05.web.app) — try it out! (don't mind the design, I'm focusing on functionality at the moment)
+
 ---
 
 ## What it does
