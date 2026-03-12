@@ -197,10 +197,10 @@ supabase functions deploy progress
 - [x] POC — Dart Frog backend + Flutter UI
 - [x] Serverless architecture design
 - [x] Supabase Edge Functions pipeline
-- [ ] Flutter auth + guest mode
-- [ ] Full UI wiring
-- [ ] Progress tracking
-- [ ] PWA config
-- [ ] Production deployment
+- [x] Flutter auth + guest mode
+- [x] Full UI wiring
+- [x] Progress tracking
+- [x] PWA config
+- [x] Production deployment
 - [ ] Apple SSO
 - [ ] TikTok support

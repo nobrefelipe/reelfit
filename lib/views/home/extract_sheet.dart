@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../controllers/extract_controller.dart';
@@ -77,13 +78,17 @@ class _ExtractContentState extends State<_ExtractContent> {
       children: [
         TextField(
           controller: _controller,
-          autofocus: true,
-          enabled: !_isLoading,
-          keyboardType: TextInputType.url,
-          textInputAction: TextInputAction.go,
-          onSubmitted: (_) => _onExtract(),
+          autofocus: false,
+          readOnly: true,
+          onTap: () async {
+            final data = await Clipboard.getData(Clipboard.kTextPlain);
+            if (data?.text != null) {
+              _controller.text = data!.text!;
+            }
+          },
           decoration: const InputDecoration(
-            hintText: 'Paste YouTube Shorts URL',
+            hintText: 'Tap to paste URL',
+            suffixIcon: Icon(Icons.content_paste),
             border: OutlineInputBorder(),
           ),
         ),
