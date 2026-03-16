@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'atom.dart';
 import 'result.dart';
@@ -21,10 +23,13 @@ class AsyncAtom<T> extends ValueNotifier<Result<T>> {
     _atomRegistry.add(this);
   }
 
-  void emit(Result<T> state) => value = state;
+  // ─── Stream state ─────────────────────────────────────────────────────────
 
-  /// Resets this atom to Idle(). Called by AuthBuilder on logout.
-  void reset() => value = Idle();
+  StreamSubscription<T>? _subscription;
+
+  // ─── Core emit ───────────────────────────────────────────────────────────
+
+  void emit(Result<T> state) => value = state;
 
   /// Call the atom directly as a widget.
   /// Only [success] is required. Defaults:
@@ -53,6 +58,65 @@ class AsyncAtom<T> extends ValueNotifier<Result<T>> {
         Idle() => idle?.call() ?? const SizedBox(),
       },
     );
+  }
+
+  /// Resets this atom to Idle(). Called by AuthBuilder on logout.
+  void reset() {
+    cancelStream(); // always kill the stream before wiping state
+    value = Idle();
+  }
+
+  // ─── Stream subscription ──────────────────────────────────────────────────
+
+  /// Subscribes to [stream] and maps events into Result<T> automatically.
+  ///
+  /// [onData]  — optional side effect after a successful emit (e.g. cache write,
+  ///             flipping a stale flag). Runs *after* the atom updates so the
+  ///             UI is never blocked by a disk write.
+  ///
+  /// [onError] — called when the stream emits an error or closes unexpectedly.
+  ///             The atom is intentionally *not* set to Failure() here — if
+  ///             we already have Success data on screen, we don't want to
+  ///             blank the UI. The controller decides what to show instead
+  ///             (e.g. a stale banner + retry).
+  ///
+  /// Calling listenTo() a second time (e.g. after a manual refresh) safely
+  /// cancels the previous subscription before attaching the new one.
+  void listenTo(
+    Stream<T> stream, {
+    Future<void> Function(T data)? onData,
+    void Function(Object error)? onError,
+  }) {
+    _subscription?.cancel();
+
+    _subscription = stream.listen(
+      (data) async {
+        emit(Success(data));
+        await onData?.call(data);
+      },
+      onError: (error) => onError?.call(error),
+      // Stream closing (WebSocket disconnect, Firebase going offline)
+      // is treated the same as an error — surfaces to the controller.
+      onDone: () => onError?.call(
+        StateError('Stream closed unexpectedly'),
+      ),
+      // false = a single bad event doesn't kill the subscription.
+      // The controller's onError callback decides when to give up.
+      cancelOnError: false,
+    );
+  }
+
+  /// Cancels the active stream subscription without changing atom state.
+  /// Call this when you want to stop listening but keep the last value visible.
+  void cancelStream() {
+    _subscription?.cancel();
+    _subscription = null;
+  }
+
+  @override
+  void dispose() {
+    cancelStream();
+    super.dispose();
   }
 }
 
